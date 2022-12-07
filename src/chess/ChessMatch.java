@@ -7,8 +7,8 @@ import chess.pieces.Rei;
 import chess.pieces.Torre;
 
 public class ChessMatch {
-	private Board board; 
-	
+	private Board board;
+
 	public ChessMatch() {
 		board = new Board(8, 8);
 		initialSetup();
@@ -18,30 +18,37 @@ public class ChessMatch {
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
 		for (int i = 0; i < board.getRows(); i++) {
 			for (int j = 0; j < board.getColumns(); j++) {
-				mat[i][j] = (ChessPiece) board.piece(i,j);
+				mat[i][j] = (ChessPiece) board.piece(i, j);
 			}
 		}
 		return mat;
 	}
 
-	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition){
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
+		validadeTargetPosition(source,target);
 		Piece capturedPiece = makeMove(source, target);
 		return (ChessPiece) capturedPiece;
 	}
 
-	private void validateSourcePosition(Position position){
-		if(!board.thereIsAPiece(position)){
+	private void validateSourcePosition(Position position) {
+		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("Nao existe peca na posicao de origem!");
 		}
-		if(!board.piece(position).isThereAnyPossibleMove()) {
+		if (!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("Nao existem movimentos possiveis para a peca escolhida!");
 		}
 	}
+	
+	private void validadeTargetPosition(Position source, Position target) {
+		if(!board.piece(source).possibleMove(target)) {
+			throw new ChessException("A peca escolhida nao pode se mover para a posicao de destino!");
+		}
+	}
 
-	private Piece makeMove(Position source, Position target){
+	private Piece makeMove(Position source, Position target) {
 		Piece p = board.removePiece(source);
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
@@ -49,11 +56,11 @@ public class ChessMatch {
 		return capturedPiece;
 	}
 
-	private void placeNewPiece(char column, int row, ChessPiece piece){
+	private void placeNewPiece(char column, int row, ChessPiece piece) {
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
 	}
 
-	public void initialSetup(){
+	public void initialSetup() {
 		placeNewPiece('c', 2, new Torre(board, Color.WHITE));
 		placeNewPiece('d', 2, new Torre(board, Color.WHITE));
 		placeNewPiece('e', 2, new Torre(board, Color.WHITE));
@@ -66,7 +73,6 @@ public class ChessMatch {
 		placeNewPiece('e', 7, new Torre(board, Color.BLACK));
 		placeNewPiece('e', 8, new Torre(board, Color.BLACK));
 		placeNewPiece('d', 8, new Rei(board, Color.BLACK));
-
 
 	}
 }

@@ -19,12 +19,12 @@ public class Program {
 				UI.clearScreen();
 				UI.printBoard(chmatch.getPieces());
 				System.out.println();
-				System.out.println("Origem: ");
+				System.out.print("Origem: ");
 				ChessPosition source = UI.readChessPosition(sc);
 	
 				System.out.println();
 	
-				System.out.println("Alvo: ");
+				System.out.print("Alvo: ");
 				ChessPosition target = UI.readChessPosition(sc);
 	
 				ChessPiece capturedPiece = chmatch.performChessMove(source,target);
