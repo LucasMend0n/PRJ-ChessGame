@@ -1,5 +1,6 @@
 package application;
 
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Color;
@@ -44,6 +45,13 @@ public class UI {
 			throw new InputMismatchException("Erro lendo posicao de xadrex! Posicoes validas vao de a1 ate h8");
 		}
 	}
+	
+	public static void printMatch(ChessMatch chessMatch) {
+		printBoard(chessMatch.getPieces());
+		System.out.println();
+		System.out.println("Rodada: " + chessMatch.getTurn());
+		System.out.println("Esperando pelo jogador: " + chessMatch.getCurrentPlayer());
+	}
 
 	public static void printBoard(ChessPiece[][] pieces) {
 
@@ -78,7 +86,7 @@ public class UI {
 			System.out.print("-" + ANSI_RESET);
 		}
 		else {
-			if (piece.getColor() == Color.WHITE) {
+			if (piece.getColor() == Color.BRANCO) {
 				System.out.print(ANSI_WHITE + piece + ANSI_RESET);
 			}
 			else {
