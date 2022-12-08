@@ -13,7 +13,7 @@ public class Rei extends ChessPiece {
 
 	@Override
 	public String toString() {
-		return "Re";
+		return "K";
 	}
 
 	@Override
@@ -31,37 +31,37 @@ public class Rei extends ChessPiece {
 		// below
 		p.setValues(position.getRow() + 1, position.getColumn());
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//left
+		// left
 		p.setValues(position.getRow(), position.getColumn() - 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//right
+		// right
 		p.setValues(position.getRow(), position.getColumn() + 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//Nw
-		p.setValues(position.getRow() - 1, position.getColumn() -1);
+		// Nw
+		p.setValues(position.getRow() - 1, position.getColumn() - 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//ne
-		p.setValues(position.getRow() -1, position.getColumn() + 1);
+		// ne
+		p.setValues(position.getRow() - 1, position.getColumn() + 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//sw
+		// sw
 		p.setValues(position.getRow() + 1, position.getColumn() - 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
-		//se
+		// se
 		p.setValues(position.getRow() + 1, position.getColumn() + 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
-			mat[p.getRow()][p.getColumn()] = true; 
+			mat[p.getRow()][p.getColumn()] = true;
 		}
 
 		return mat;
