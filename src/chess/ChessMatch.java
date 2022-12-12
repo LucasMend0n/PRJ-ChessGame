@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +21,8 @@ public class ChessMatch {
     private Color currentPlayer;
     private boolean check;
     private boolean checkMate;
-    private ChessPiece enPassantVunerable;
+    private ChessPiece enPassantVulnerable;
+    private ChessPiece promoted;
 
     private List<Piece> piecesOnBoard = new ArrayList<>();
     private List<Piece> capturedPieces = new ArrayList<>();
@@ -29,7 +31,6 @@ public class ChessMatch {
         board = new Board(8, 8);
         turn = 1;
         currentPlayer = Color.BRANCO;
-        check = false;
         initialSetup();
     }
 
@@ -49,8 +50,12 @@ public class ChessMatch {
         return checkMate;
     }
 
-    public ChessPiece getEnPassantVunerable() {
-        return enPassantVunerable;
+    public ChessPiece getPromoted() {
+        return promoted;
+    }
+
+    public ChessPiece getEnPassantVulnerable() {
+        return enPassantVulnerable;
     }
 
     public ChessPiece[][] getPieces() {
@@ -81,46 +86,66 @@ public class ChessMatch {
             throw new ChessException("Voce nao pode se colocar em cheque!");
         }
 
-        ChessPiece movedPiece = (ChessPiece) board.piece(target);
+        ChessPiece movedPiece = (ChessPiece)board.piece(target);
+
+        // #specialmove promotion
+        promoted = null;
+        if (movedPiece instanceof Peao) {
+            if ((movedPiece.getColor() == Color.BRANCO && target.getRow() == 0) || (movedPiece.getColor() == Color.PRETO && target.getRow() == 7)) {
+                promoted = (ChessPiece)board.piece(target);
+                promoted = replacePromotedPiece("Q");
+            }
+        }
 
         check = (testCheck(opponent(currentPlayer))) ? true : false;
 
-        if (testCheckMate(opponent(currentPlayer))) {
-            checkMate = true;
-        } else {
-            nextTurn();
+		if (testCheckMate(opponent(currentPlayer))) {
+			checkMate = true;
+		}
+		else {
+			nextTurn();
+		}
+
+		// #specialmove en passant
+		if (movedPiece instanceof Peao && (target.getRow() == source.getRow() - 1 || target.getRow() == source.getRow() + 1)) {
+			enPassantVulnerable = movedPiece;
+		}
+		else {
+			enPassantVulnerable = null;
+		}
+
+		return (ChessPiece)capturedPiece;
+	}
+
+
+    public ChessPiece replacePromotedPiece(String type) {
+        if (promoted == null) {
+            throw new IllegalStateException("Nao ha peca a ser promovida!");
+        }
+        if (!type.equals("B") && !type.equals("C") && !type.equals("T") & !type.equals("Q")) {
+            throw new InvalidParameterException("Tipo invalido para promocao");
         }
 
-        //Special move enpassant
-        if (movedPiece instanceof Peao && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
-            enPassantVunerable = movedPiece;
-        } else {
-            enPassantVunerable = null;
-        }
+        Position pos = promoted.getChessPosition().toPosition();
+        Piece p = board.removePiece(pos);
+        piecesOnBoard.remove(p);
 
-        return (ChessPiece) capturedPiece;
+        ChessPiece newPiece = newPiece(type, promoted.getColor());
+        board.placePiece(newPiece, pos);
+        piecesOnBoard.add(newPiece);
+
+        return newPiece;
     }
 
-    private void validateSourcePosition(Position position) {
-
-        if (!board.thereIsAPiece(position)) {
-            throw new ChessException("Nao existe peca na posicao de origem!");
-        }
-        if (currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
-            throw new ChessException("A peca escolhida nao é sua! Tente outra!");
-        }
-        if (!board.piece(position).isThereAnyPossibleMove()) {
-            throw new ChessException("Nao existem movimentos possiveis para a peca escolhida!");
-        }
-    }
-
-    private void validadeTargetPosition(Position source, Position target) {
-        if (!board.piece(source).possibleMove(target)) {
-            throw new ChessException("A peca escolhida nao pode se mover para a posicao de destino!");
-        }
+    private ChessPiece newPiece(String type, Color color) {
+        if (type.equals("B")) return new Bispo(board, color);
+        if (type.equals("C")) return new Cavalo(board, color);
+        if (type.equals("Q")) return new Rainha(board, color);
+        return new Torre(board, color);
     }
 
     private Piece makeMove(Position source, Position target) {
+
         ChessPiece p = (ChessPiece) board.removePiece(source);
         p.increaseMoveCount();
         Piece capturedPiece = board.removePiece(target);
@@ -135,7 +160,7 @@ public class ChessMatch {
         if (p instanceof Rei && target.getColumn() == source.getColumn() + 2) {
             Position sourceT = new Position(source.getRow(), source.getColumn() + 3);
             Position targetT = new Position(source.getRow(), source.getColumn() + 1);
-            ChessPiece rook = (ChessPiece) board.removePiece(sourceT);
+            ChessPiece rook = (ChessPiece)board.removePiece(sourceT);
             board.placePiece(rook, targetT);
             rook.increaseMoveCount();
         }
@@ -166,7 +191,7 @@ public class ChessMatch {
     }
 
     private void undoMove(Position source, Position target, Piece capturedPiece) {
-        ChessPiece p = (ChessPiece) board.removePiece(target);
+        ChessPiece p = (ChessPiece)board.removePiece(target);
         p.decreaseMoveCount();
         board.placePiece(p, source);
 
@@ -180,7 +205,7 @@ public class ChessMatch {
         if (p instanceof Rei && target.getColumn() == source.getColumn() + 2) {
             Position sourceT = new Position(source.getRow(), source.getColumn() + 3);
             Position targetT = new Position(source.getRow(), source.getColumn() + 1);
-            ChessPiece rook = (ChessPiece) board.removePiece(targetT);
+            ChessPiece rook = (ChessPiece)board.removePiece(targetT);
             board.placePiece(rook, sourceT);
             rook.decreaseMoveCount();
         }
@@ -188,15 +213,17 @@ public class ChessMatch {
         if (p instanceof Rei && target.getColumn() == source.getColumn() - 2) {
             Position sourceT = new Position(source.getRow(), source.getColumn() - 4);
             Position targetT = new Position(source.getRow(), source.getColumn() - 1);
-            ChessPiece rook = (ChessPiece) board.removePiece(targetT);
+            ChessPiece rook = (ChessPiece)board.removePiece(targetT);
             board.placePiece(rook, sourceT);
             rook.decreaseMoveCount();
         }
         //special moveEnpassant
         if (p instanceof Peao) {
-            if (source.getColumn() != target.getColumn() && capturedPiece == enPassantVunerable) {
+
+            if (source.getColumn() != target.getColumn() && capturedPiece == enPassantVulnerable) {
                 ChessPiece pawn = (ChessPiece)board.removePiece(target);
                 Position pawnPosition;
+
                 if (p.getColor() == Color.BRANCO) {
                     pawnPosition = new Position(3, target.getColumn());
                 } else {
@@ -209,14 +236,28 @@ public class ChessMatch {
 
     }
 
+    private void validateSourcePosition(Position position) {
+
+        if (!board.thereIsAPiece(position)) {
+            throw new ChessException("Nao existe peca na posicao de origem!");
+        }
+        if (currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
+            throw new ChessException("A peca escolhida nao é sua! Tente outra!");
+        }
+        if (!board.piece(position).isThereAnyPossibleMove()) {
+            throw new ChessException("Nao existem movimentos possiveis para a peca escolhida!");
+        }
+    }
+
+    private void validadeTargetPosition(Position source, Position target) {
+        if (!board.piece(source).possibleMove(target)) {
+            throw new ChessException("A peca escolhida nao pode se mover para a posicao de destino!");
+        }
+    }
+
     private void nextTurn() {
         turn++;
         currentPlayer = (currentPlayer == Color.BRANCO) ? Color.PRETO : Color.BRANCO;
-    }
-
-    private void placeNewPiece(char column, int row, ChessPiece piece) {
-        board.placePiece(piece, new ChessPosition(column, row).toPosition());
-        piecesOnBoard.add(piece);
     }
 
     public Color opponent(Color color) {
@@ -273,6 +314,11 @@ public class ChessMatch {
         }
 
         return true;
+    }
+
+    private void placeNewPiece(char column, int row, ChessPiece piece) {
+        board.placePiece(piece, new ChessPosition(column, row).toPosition());
+        piecesOnBoard.add(piece);
     }
 
     public void initialSetup() {

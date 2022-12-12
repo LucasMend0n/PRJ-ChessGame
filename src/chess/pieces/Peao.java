@@ -27,8 +27,7 @@ public class Peao extends ChessPiece {
 			}
 			p.setValues(position.getRow() - 2, position.getColumn());
 			Position p2 = new Position(position.getRow() - 1, position.getColumn());
-			if (getBoard().positionExists(p) && !getBoard().thereIsAPiece(p) && getBoard().positionExists(p2)
-					&& !getBoard().thereIsAPiece(p2) && getMoveCount() == 0) {
+			if (getBoard().positionExists(p) && !getBoard().thereIsAPiece(p) && getBoard().positionExists(p2) && !getBoard().thereIsAPiece(p2) && getMoveCount() == 0) {
 				mat[p.getRow()][p.getColumn()] = true;
 			}
 			p.setValues(position.getRow() - 1, position.getColumn() - 1);
@@ -40,29 +39,26 @@ public class Peao extends ChessPiece {
 				mat[p.getRow()][p.getColumn()] = true;
 			}
 
-			//special move Enpassant White
-			if (position.getRow() == 3){
-				Position left = new Position(position.getRow(), position.getColumn() -1);
-				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVunerable()){
+			// special move Enpassant White
+			if (position.getRow() == 3) {
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
 					mat[left.getRow() - 1][left.getColumn()] = true;
 				}
-				Position right = new Position(position.getRow(), position.getColumn() +1);
-				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVunerable()){
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
 					mat[right.getRow() - 1][right.getColumn()] = true;
 				}
 			}
-
-
-		} else {
-			//black Pawn
+		}
+		else {
 			p.setValues(position.getRow() + 1, position.getColumn());
 			if (getBoard().positionExists(p) && !getBoard().thereIsAPiece(p)) {
 				mat[p.getRow()][p.getColumn()] = true;
 			}
 			p.setValues(position.getRow() + 2, position.getColumn());
 			Position p2 = new Position(position.getRow() + 1, position.getColumn());
-			if (getBoard().positionExists(p) && !getBoard().thereIsAPiece(p) && getBoard().positionExists(p2)
-					&& !getBoard().thereIsAPiece(p2) && getMoveCount() == 0) {
+			if (getBoard().positionExists(p) && !getBoard().thereIsAPiece(p) && getBoard().positionExists(p2) && !getBoard().thereIsAPiece(p2) && getMoveCount() == 0) {
 				mat[p.getRow()][p.getColumn()] = true;
 			}
 			p.setValues(position.getRow() + 1, position.getColumn() - 1);
@@ -74,15 +70,15 @@ public class Peao extends ChessPiece {
 				mat[p.getRow()][p.getColumn()] = true;
 			}
 
-			//special move Enpassant Black
-			if (position.getRow() == 4){
-				Position left = new Position(position.getRow(), position.getColumn() -1);
-				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVunerable()){
+			// #specialmove en passant black
+			if (position.getRow() == 4) {
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
 					mat[left.getRow() + 1][left.getColumn()] = true;
 				}
-				Position right = new Position(position.getRow(), position.getColumn() +1);
-				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVunerable()){
-					mat[right.getRow() +1][right.getColumn()] = true;
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
+					mat[right.getRow() + 1][right.getColumn()] = true;
 				}
 			}
 		}
